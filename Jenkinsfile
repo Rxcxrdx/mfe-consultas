@@ -46,6 +46,7 @@ pipeline {
     }
 
     stage('Push a ACR') {
+      when { branch 'dev' }
       steps {
         withCredentials([usernamePassword(credentialsId: 'acr-creds', usernameVariable: 'ACR_USER', passwordVariable: 'ACR_PASS')]) {
           sh 'echo "$ACR_PASS" | docker login "$ACR_LOGIN_SERVER" -u "$ACR_USER" --password-stdin'
@@ -56,6 +57,7 @@ pipeline {
     }
 
     stage('Deploy a AKS') {
+      when { branch 'dev' }
       steps {
         withKubeConfig([credentialsId: 'kubeconfig-aks']) {
           sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}=${ACR_LOGIN_SERVER}/${APP_NAME}:${BUILD_NUMBER}"
